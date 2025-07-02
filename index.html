@@ -493,7 +493,6 @@
       let activityRows = [];
       students.forEach(student => {
         let studentEvents = [];
-        // Öğrenci adı normalize fonksiyonu
         const normalize = s => (s || '').trim().toLowerCase();
         const studentNameNorm = normalize(student.name);
         lessons.filter(lesson => normalize(lesson.student) === studentNameNorm).forEach(lesson => {
