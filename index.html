@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Language School Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .container { margin-top: 20px; }
+    .nav-tabs .nav-link { font-size: 0.9rem; }
+    .table-responsive { max-height: 500px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <div id="login-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#f8f9fa;z-index:9999;display:flex;align-items:center;justify-content:center;">
+    <form id="loginForm" style="min-width:320px;max-width:90vw;background:white;padding:32px 24px 24px 24px;border-radius:12px;box-shadow:0 2px 16px #0001;">
+      <h4 class="mb-3 text-center">Login</h4>
+      <div class="mb-3">
+        <input type="text" class="form-control" id="loginUsername" placeholder="Username" required autofocus>
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Login</button>
+      </div>
+      <div id="loginError" class="text-danger mt-2 text-center" style="display:none;font-size:0.95em;"></div>
+    </form>
+  </div>
+  <div class="container-fluid">
+    <h2 class="mb-4">Fener English Dashboard</h2>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab">Students</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button" role="tab">Teachers</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="lessons-tab" data-bs-toggle="tab" data-bs-target="#lessons" type="button" role="tab">Lessons</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Accounts Receivable Total</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button" role="tab">Expenses</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="accounts-payable-tab" data-bs-toggle="tab" data-bs-target="#accounts-payable" type="button" role="tab">Accounts Payable Total</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="monthly-report-tab" data-bs-toggle="tab" data-bs-target="#monthly-report" type="button" role="tab">General Report</button>
+      </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-3" id="dashboardTabsContent">
+      
+      <!-- Students Tab -->
+      <div class="tab-pane fade show active" id="students" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>Students</h4>
+        </div>
+        <div class="mb-3">
+          <form id="addStudentForm" class="row g-2">
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="studentName" placeholder="Name" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="studentTC" placeholder="TC Number" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="studentPhone" placeholder="Phone" required>
+            </div>
+            <div class="col-md-2">
+              <input type="date" class="form-control" id="studentDate" required>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select" id="studentPackage" required>
+                <option value="">Package</option>
+                <option value="12">12 Hours</option>
+                <option value="24">24 Hours</option>
+                <option value="28">28 Hours</option>
+                <option value="32">32 Hours</option>
+                <option value="36">36 Hours</option>
+                <option value="64">64 Hours</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+          </form>
+        </div>
+        <div class="table-responsive">
+          <div id="students-table"></div>
+        </div>
+      </div>
+
+      <!-- Teachers Tab -->
+      <div class="tab-pane fade" id="teachers" role="tabpanel">
+        <h4>Teachers</h4>
+        <div class="mb-3">
+          <form id="addTeacherForm" class="row g-2">
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="teacherName" placeholder="Name" required>
+            </div>
+            <div class="col-md-3">
+              <input type="email" class="form-control" id="teacherEmail" placeholder="Email" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="teacherPhone" placeholder="Phone" required>
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" id="teacherBranch" placeholder="Branch" required>
+            </div>
+            <div class="col-md-1">
+              <input type="date" class="form-control" id="teacherDate" required>
+            </div>
+            <div class="col-md-1">
+              <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+          </form>
+        </div>
+        <div class="table-responsive">
+          <div id="teachers-table"></div>
+        </div>
+      </div>
+
+      <!-- Lessons Tab -->
+      <div class="tab-pane fade" id="lessons" role="tabpanel">
+        <h4>Lessons</h4>
+        <div class="mb-3">
+          <form id="addLessonForm" class="row g-2">
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="lessonStudent" placeholder="Student" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="lessonTeacher" placeholder="Teacher" required>
+            </div>
+            <div class="col-md-2">
+              <input type="date" class="form-control" id="lessonDate" required>
+            </div>
+            <div class="col-md-2">
+              <input type="time" class="form-control" id="lessonTime" required>
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control" id="lessonDuration" placeholder="Duration (min)" required>
+            </div>
+            <div class="col-md-1">
+              <input type="text" class="form-control" id="lessonNotes" placeholder="Notes">
+            </div>
+            <div class="col-md-1">
+              <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+          </form>
+        </div>
+        <div class="table-responsive">
+          <div id="lessons-table"></div>
+        </div>
+      </div>
+
+      <!-- Payments Tab -->
+      <div class="tab-pane fade" id="payments" role="tabpanel">
+        <h4>Accounts Receivable Total</h4>
+        <div class="mb-3">
+          <form id="addPaymentForm" class="row g-2">
+            <div class="col-md-2">
+              <select class="form-select" id="paymentStudent" required>
+                <option value="">Student</option>
+              </select>
+            </div>
+            <div class="col-md-1">
+              <input type="number" class="form-control" id="paymentInstallment" placeholder="No" min="1" max="4" required>
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control" id="paymentAmount" placeholder="Amount" required>
+            </div>
+            <div class="col-md-2">
+              <input type="date" class="form-control" id="paymentDate" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="paymentMethod" placeholder="Method" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="paymentNotes" placeholder="Notes">
+            </div>
+            <div class="col-md-1">
+              <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+          </form>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered" id="paymentsTable">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Installment No</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Kayıtlar buraya gelecek -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Expenses Tab -->
+      <div class="tab-pane fade" id="expenses" role="tabpanel">
+        <h4>Expenses</h4>
+        <div class="mb-3">
+          <form id="addExpenseForm" class="row g-2">
+            <div class="col-md-2">
+              <input type="date" class="form-control" id="expenseDate" required>
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="expenseCategory" placeholder="Category" required>
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control" id="expenseAmount" placeholder="Amount" required>
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" id="expenseDescription" placeholder="Description">
+            </div>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="expenseNotes" placeholder="Notes">
+            </div>
+            <div class="col-md-1">
+              <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+          </form>
+        </div>
+        <div class="table-responsive">
+          <div id="expenses-table"></div>
+        </div>
+      </div>
+
+      <!-- Accounts Payable Tab -->
+      <div class="tab-pane fade" id="accounts-payable" role="tabpanel">
+        <h4>Accounts Payable Total</h4>
+        <form id="addAccountsPayableForm" class="row g-2 mb-3">
+          <div class="col-md-1">
+            <input type="number" step="0.01" class="form-control" id="apPayRate" placeholder="Pay rate" required>
+          </div>
+          <div class="col-md-2">
+            <input type="number" class="form-control" id="apLessonsRemaining" placeholder="Lessons Remaining" required>
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="apInstructorName" placeholder="Instructor Name" required>
+          </div>
+          <div class="col-md-2">
+            <input type="number" step="0.01" class="form-control" id="apTotalAmount" placeholder="Total Amount" required>
+          </div>
+          <div class="col-md-2">
+            <input type="date" class="form-control" id="apDueDate" placeholder="Due Date">
+          </div>
+          <div class="col-md-2">
+            <input type="number" step="0.01" class="form-control" id="apBalanceDue" placeholder="Balance Due" required>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-success w-100">Add</button>
+          </div>
+        </form>
+        <div class="table-responsive">
+          <table class="table table-bordered" id="accountsPayableTable">
+            <thead>
+              <tr>
+                <th>Pay rate</th>
+                <th>Lessons Remaining</th>
+                <th>Instructor Name</th>
+                <th>Total Amount</th>
+                <th>Due Date</th>
+                <th>Balance Due</th>
+                <th>Payment 1</th>
+                <th>Payment 2</th>
+                <th>Payment 3</th>
+                <th>Payment 4</th>
+                <th>Payment 5</th>
+                <th>Payment 6</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Student Report Tab -->
+      <div class="tab-pane fade" id="monthly-report" role="tabpanel">
+        <h4>General Report</h4>
+        <div class="table-responsive">
+          <div id="student-report-table"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Initialize data structure
+    let students = JSON.parse(localStorage.getItem('students')) || [];
+    let teachers = JSON.parse(localStorage.getItem('teachers')) || [];
+    let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+    let payments = JSON.parse(localStorage.getItem('payments')) || [];
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let accountsPayable = JSON.parse(localStorage.getItem('accountsPayable')) || [
+      {payRate:7.00, lessonsRemaining:153, instructorName:'Kendra', totalAmount:1071, dueDate:'', balanceDue:1071, payments:[null,null,null,null,null,null]},
+      {payRate:10.00, lessonsRemaining:35, instructorName:'Mehmet', totalAmount:350, dueDate:'', balanceDue:350, payments:[null,null,null,null,null,null]},
+      {payRate:7.50, lessonsRemaining:13, instructorName:'Lydia', totalAmount:97.5, dueDate:'', balanceDue:-97.5, payments:[null,null,null,null,null,null]},
+    ];
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      displayStudents();
+      displayTeachers();
+      displayLessons();
+      displayPayments();
+      displayExpenses();
+      displayAccountsPayable();
+      updateDropdowns();
+      generateStudentReport();
+    });
+
+    // Display functions
+    function displayStudents() {
+      const container = document.getElementById('students-table');
+      if (!container) return;
+      if (students.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No students found. Add your first student above.</div>';
+        return;
+      }
+      let html = `<table class="table table-striped"><thead><tr><th>Name</th><th>TC Number</th><th>Phone</th><th>Date</th><th>Package</th><th>Actions</th></tr></thead><tbody>`;
+      students.forEach((student, index) => {
+        html += `<tr><td>${student.name || ''}</td><td>${student.tc || ''}</td><td>${student.phone || ''}</td><td>${student.date || ''}</td><td>${student.package || ''}</td><td><button class="btn btn-sm btn-danger" onclick="deleteStudent(${index})">Delete</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    function displayTeachers() {
+      const container = document.getElementById('teachers-table');
+      if (!container) return;
+      if (teachers.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No teachers found. Add your first teacher above.</div>';
+        return;
+      }
+      let html = `<table class="table table-striped"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Branch</th><th>Date</th><th>Actions</th></tr></thead><tbody>`;
+      teachers.forEach((teacher, index) => {
+        html += `<tr><td>${teacher.name || ''}</td><td>${teacher.email || ''}</td><td>${teacher.phone || ''}</td><td>${teacher.branch || ''}</td><td>${teacher.date || ''}</td><td><button class="btn btn-sm btn-danger" onclick="deleteTeacher(${index})">Delete</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    function displayLessons() {
+      const container = document.getElementById('lessons-table');
+      if (!container) return;
+      if (lessons.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No lessons found. Add your first lesson above.</div>';
+        return;
+      }
+      let html = `<table class="table table-striped"><thead><tr><th>Student</th><th>Teacher</th><th>Date</th><th>Time</th><th>Duration</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
+      lessons.forEach((lesson, index) => {
+        html += `<tr><td>${lesson.student || ''}</td><td>${lesson.teacher || ''}</td><td>${lesson.date || ''}</td><td>${lesson.time || ''}</td><td>${lesson.duration || ''}</td><td>${lesson.notes || ''}</td><td><button class="btn btn-sm btn-danger" onclick="deleteLesson(${index})">Delete</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    function displayPayments() {
+      const tbody = document.querySelector('#paymentsTable tbody');
+      tbody.innerHTML = '';
+      payments.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.student}</td>
+          <td>${p.installment}</td>
+          <td>${p.amount}</td>
+          <td>${p.date}</td>
+          <td>${p.method}</td>
+          <td>${p.notes}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deletePayment(${i})">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    function displayExpenses() {
+      const container = document.getElementById('expenses-table');
+      if (!container) return;
+      if (expenses.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No expenses found. Add your first expense above.</div>';
+        return;
+      }
+      let html = `<table class="table table-striped"><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Description</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
+      expenses.forEach((expense, index) => {
+        html += `<tr><td>${expense.date || ''}</td><td>${expense.category || ''}</td><td>${expense.amount || ''}</td><td>${expense.description || ''}</td><td>${expense.notes || ''}</td><td><button class="btn btn-sm btn-danger" onclick="deleteExpense(${index})">Delete</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    function displayAccountsPayable() {
+      const tbody = document.querySelector('#accountsPayableTable tbody');
+      tbody.innerHTML = '';
+      accountsPayable.forEach((ap, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${ap.payRate}</td>
+          <td>${ap.lessonsRemaining}</td>
+          <td>${ap.instructorName}</td>
+          <td>${ap.totalAmount}</td>
+          <td>${ap.dueDate || ''}</td>
+          <td>${ap.balanceDue >= 0 ? '$ ' + ap.balanceDue.toFixed(2) : '($ ' + Math.abs(ap.balanceDue).toFixed(2) + ')'}</td>
+          <td>${ap.payments[0] || ''}</td>
+          <td>${ap.payments[1] || ''}</td>
+          <td>${ap.payments[2] || ''}</td>
+          <td>${ap.payments[3] || ''}</td>
+          <td>${ap.payments[4] || ''}</td>
+          <td>${ap.payments[5] || ''}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteAccountsPayable(${i})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    function generateStudentReport() {
+      const container = document.getElementById('student-report-table');
+      if (!container) return;
+
+      // --- Summary boxes ---
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      let totalHoursThisMonth = 0;
+      let totalHoursThisYear = 0;
+      let totalPaymentsThisMonth = 0;
+      // Accounts Payable monthly total (from static data)
+      let accountsPayableMonthlyTotal = 1071 + 350 + 97.5; // $1,518.50
+      lessons.forEach(lesson => {
+        if (!lesson.date) return;
+        const lessonDate = new Date(lesson.date);
+        const duration = parseFloat(lesson.duration) || 0;
+        if (lessonDate.getFullYear() === currentYear) {
+          totalHoursThisYear += duration / 60;
+          if (lessonDate.getMonth() === currentMonth) {
+            totalHoursThisMonth += duration / 60;
+          }
+        }
+      });
+      payments.forEach(payment => {
+        if (!payment.date) return;
+        const paymentDate = new Date(payment.date);
+        if (paymentDate.getFullYear() === currentYear && paymentDate.getMonth() === currentMonth) {
+          totalPaymentsThisMonth += parseFloat(payment.amount) || 0;
+        }
+      });
+
+      let summaryHtml = `
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <div class="alert alert-primary text-center" role="alert">
+              <b>Total Lessons This Month:</b> ${totalHoursThisMonth.toFixed(1)} hours
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="alert alert-success text-center" role="alert">
+              <b>Total Lessons This Year (Since January):</b> ${totalHoursThisYear.toFixed(1)} hours
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="alert alert-info text-center" role="alert">
+              <b>Total Student Payments This Month:</b> ${totalPaymentsThisMonth.toFixed(2)}₺
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="alert alert-warning text-center" role="alert">
+              <b>Accounts Payable This Month:</b> $${accountsPayableMonthlyTotal.toFixed(2)}
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = summaryHtml;
+
+      // --- Student Activity Table ---
+      let activityRows = [];
+      students.forEach(student => {
+        let studentEvents = [];
+        // Öğrenci adı normalize fonksiyonu
+        const normalize = s => (s || '').trim().toLowerCase();
+        const studentNameNorm = normalize(student.name);
+        lessons.filter(lesson => normalize(lesson.student) === studentNameNorm).forEach(lesson => {
+          studentEvents.push({
+            type: 'Lesson',
+            date: lesson.date,
+            time: lesson.time,
+            duration: lesson.duration,
+            amount: '',
+            teacher: lesson.teacher,
+            notes: lesson.notes || ''
+          });
+        });
+        payments.filter(payment => normalize(payment.student) === studentNameNorm).forEach(payment => {
+          studentEvents.push({
+            type: 'Payment',
+            date: payment.date,
+            time: '',
+            duration: '',
+            amount: payment.amount,
+            teacher: '',
+            notes: payment.notes || ''
+          });
+        });
+        studentEvents.sort((a, b) => {
+          if (a.date === b.date) {
+            return (a.time || '').localeCompare(b.time || '');
+          }
+          return (a.date || '').localeCompare(b.date || '');
+        });
+        const packageInfo = packages[student.package] || { hours: 0, rate: 0 };
+        let totalHours = packageInfo.hours;
+        let usedHours = 0;
+        let totalPaid = 0;
+        let totalCost = totalHours * packageInfo.rate;
+        studentEvents.forEach(event => {
+          if (event.type === 'Lesson') {
+            usedHours += (parseFloat(event.duration) || 0) / 60;
+          }
+          if (event.type === 'Payment') {
+            totalPaid += parseFloat(event.amount) || 0;
+          }
+          let remainingHours = Math.max(0, totalHours - usedHours);
+          let remainingPayment = Math.max(0, totalCost - totalPaid);
+          activityRows.push({
+            student: student.name,
+            type: event.type,
+            date: event.date,
+            time: event.time,
+            duration: event.duration,
+            amount: event.amount,
+            teacher: event.teacher,
+            notes: event.notes,
+            remainingHours: remainingHours.toFixed(1),
+            remainingPayment: remainingPayment.toFixed(2)
+          });
+        });
+      });
+      activityRows.sort((a, b) => {
+        if (a.date === b.date) {
+          return (b.time || '').localeCompare(a.time || '');
+        }
+        return (b.date || '').localeCompare(a.date || '');
+      });
+      let activityHtml = `<h5 class=\"mt-4\">Student Activity Report</h5><div class=\"table-responsive\"><table class=\"table table-bordered\"><thead><tr><th>Student</th><th>Type</th><th>Date</th><th>Time</th><th>Duration</th><th>Amount</th><th>Teacher</th><th>Notes</th><th>Remaining Payment</th><th>Remaining Hours</th></tr></thead><tbody>`;
+      if (activityRows.length === 0) {
+        activityHtml += '<tr><td colspan=\"10\" class=\"text-center\">No activity found.</td></tr>';
+      } else {
+        activityRows.forEach(row => {
+          activityHtml += `<tr><td>${row.student}</td><td>${row.type}</td><td>${row.date || ''}</td><td>${row.time || ''}</td><td>${row.duration || ''}</td><td>${row.amount || ''}</td><td>${row.teacher || ''}</td><td>${row.notes || ''}</td><td>${row.remainingPayment}₺</td><td>${row.remainingHours}</td></tr>`;
+        });
+      }
+      activityHtml += '</tbody></table></div>';
+      container.innerHTML += activityHtml;
+
+      if (students.length === 0) {
+        container.innerHTML += '<div class="alert alert-info">No students found. Add students to see their reports.</div>';
+      }
+    }
+    function updateDropdowns() {
+      const studentDropdowns = ['paymentStudent'];
+      studentDropdowns.forEach(id => {
+        const dropdown = document.getElementById(id);
+        if (dropdown) {
+          dropdown.innerHTML = '<option value="">Student</option>';
+          students.forEach(student => {
+            dropdown.innerHTML += `<option value="${student.name}">${student.name}</option>`;
+          });
+        }
+      });
+      // lessonStudent ve lessonTeacher artık input olduğu için güncellenmiyor
+      const teacherDropdowns = [];
+    }
+    function deleteStudent(index) {
+      if (confirm('Are you sure you want to delete this student?')) {
+        students.splice(index, 1);
+        localStorage.setItem('students', JSON.stringify(students));
+        displayStudents();
+        updateDropdowns();
+        generateStudentReport();
+      }
+    }
+    function deleteTeacher(index) {
+      if (confirm('Are you sure you want to delete this teacher?')) {
+        teachers.splice(index, 1);
+        localStorage.setItem('teachers', JSON.stringify(teachers));
+        displayTeachers();
+        updateDropdowns();
+      }
+    }
+    function deleteLesson(index) {
+      if (confirm('Are you sure you want to delete this lesson?')) {
+        lessons.splice(index, 1);
+        localStorage.setItem('lessons', JSON.stringify(lessons));
+        displayLessons();
+        generateStudentReport();
+      }
+    }
+    function deletePayment(index) {
+      if (confirm('Are you sure you want to delete this payment?')) {
+        payments.splice(index, 1);
+        localStorage.setItem('payments', JSON.stringify(payments));
+        displayPayments();
+        generateStudentReport();
+      }
+    }
+    function deleteExpense(index) {
+      if (confirm('Are you sure you want to delete this expense?')) {
+        expenses.splice(index, 1);
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+        displayExpenses();
+      }
+    }
+    function deleteAccountsPayable(index) {
+      if (confirm('Are you sure you want to delete this record?')) {
+        accountsPayable.splice(index, 1);
+        localStorage.setItem('accountsPayable', JSON.stringify(accountsPayable));
+        displayAccountsPayable();
+      }
+    }
+    document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const student = {
+        id: Date.now().toString(),
+        name: document.getElementById('studentName').value.trim(),
+        tc: document.getElementById('studentTC').value.trim(),
+        phone: document.getElementById('studentPhone').value.trim(),
+        date: document.getElementById('studentDate').value,
+        package: document.getElementById('studentPackage').value
+      };
+      students.push(student);
+      localStorage.setItem('students', JSON.stringify(students));
+      displayStudents();
+      updateDropdowns();
+      generateStudentReport();
+      document.getElementById('addStudentForm').reset();
+    });
+    document.getElementById('addTeacherForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const teacher = {
+        id: Date.now().toString(),
+        name: document.getElementById('teacherName').value.trim(),
+        email: document.getElementById('teacherEmail').value.trim(),
+        phone: document.getElementById('teacherPhone').value.trim(),
+        branch: document.getElementById('teacherBranch').value.trim(),
+        date: document.getElementById('teacherDate').value
+      };
+      teachers.push(teacher);
+      localStorage.setItem('teachers', JSON.stringify(teachers));
+      displayTeachers();
+      updateDropdowns();
+      document.getElementById('addTeacherForm').reset();
+    });
+    document.getElementById('addLessonForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const lesson = {
+        id: Date.now().toString(),
+        student: document.getElementById('lessonStudent').value,
+        teacher: document.getElementById('lessonTeacher').value,
+        date: document.getElementById('lessonDate').value,
+        time: document.getElementById('lessonTime').value,
+        duration: document.getElementById('lessonDuration').value,
+        notes: document.getElementById('lessonNotes').value.trim()
+      };
+      lessons.push(lesson);
+      localStorage.setItem('lessons', JSON.stringify(lessons));
+      displayLessons();
+      generateStudentReport();
+      document.getElementById('addLessonForm').reset();
+    });
+    document.getElementById('addPaymentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const payment = {
+        id: Date.now().toString(),
+        student: document.getElementById('paymentStudent').value,
+        installment: document.getElementById('paymentInstallment').value,
+        amount: document.getElementById('paymentAmount').value,
+        date: document.getElementById('paymentDate').value,
+        method: document.getElementById('paymentMethod').value.trim(),
+        notes: document.getElementById('paymentNotes').value.trim()
+      };
+      payments.push(payment);
+      localStorage.setItem('payments', JSON.stringify(payments));
+      displayPayments();
+      generateStudentReport();
+      document.getElementById('addPaymentForm').reset();
+    });
+    document.getElementById('addExpenseForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const expense = {
+        id: Date.now().toString(),
+        date: document.getElementById('expenseDate').value,
+        category: document.getElementById('expenseCategory').value.trim(),
+        amount: document.getElementById('expenseAmount').value,
+        description: document.getElementById('expenseDescription').value.trim(),
+        notes: document.getElementById('expenseNotes').value.trim()
+      };
+      expenses.push(expense);
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      displayExpenses();
+      document.getElementById('addExpenseForm').reset();
+    });
+    document.getElementById('addAccountsPayableForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const ap = {
+        payRate: parseFloat(document.getElementById('apPayRate').value),
+        lessonsRemaining: parseInt(document.getElementById('apLessonsRemaining').value),
+        instructorName: document.getElementById('apInstructorName').value.trim(),
+        totalAmount: parseFloat(document.getElementById('apTotalAmount').value),
+        dueDate: document.getElementById('apDueDate').value,
+        balanceDue: parseFloat(document.getElementById('apBalanceDue').value),
+        payments: [null, null, null, null, null, null]
+      };
+      accountsPayable.push(ap);
+      localStorage.setItem('accountsPayable', JSON.stringify(accountsPayable));
+      displayAccountsPayable();
+      document.getElementById('addAccountsPayableForm').reset();
+    });
+    document.getElementById('students-tab').addEventListener('shown.bs.tab', displayStudents);
+    document.getElementById('teachers-tab').addEventListener('shown.bs.tab', displayTeachers);
+    document.getElementById('lessons-tab').addEventListener('shown.bs.tab', displayLessons);
+    document.getElementById('payments-tab').addEventListener('shown.bs.tab', displayPayments);
+    document.getElementById('expenses-tab').addEventListener('shown.bs.tab', displayExpenses);
+    document.getElementById('accounts-payable-tab').addEventListener('shown.bs.tab', displayAccountsPayable);
+    document.getElementById('monthly-report-tab').addEventListener('click', generateStudentReport);
+
+    // Simple login logic
+    const LOGIN_USER = 'kryekm';
+    const LOGIN_PASS = 'Q123456q';
+    function showDashboard() {
+      document.getElementById('login-overlay').style.display = 'none';
+      document.querySelector('.container-fluid').style.display = '';
+    }
+    function hideDashboard() {
+      document.getElementById('login-overlay').style.display = 'flex';
+      document.querySelector('.container-fluid').style.display = 'none';
+    }
+    // On page load, check sessionStorage
+    if (sessionStorage.getItem('dashboardLoggedIn') === '1') {
+      showDashboard();
+    } else {
+      hideDashboard();
+    }
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value;
+      if (u === LOGIN_USER && p === LOGIN_PASS) {
+        sessionStorage.setItem('dashboardLoggedIn', '1');
+        showDashboard();
+      } else {
+        document.getElementById('loginError').textContent = 'Invalid username or password!';
+        document.getElementById('loginError').style.display = 'block';
+      }
+    });
+
+    // Hide dashboard content by default (if not logged in)
+    if (sessionStorage.getItem('dashboardLoggedIn') !== '1') {
+      document.querySelector('.container-fluid').style.display = 'none';
+    }
+  </script>
+</body>
+</html> 
