@@ -157,6 +157,11 @@
             </div>
           </form>
         </div>
+        <div class="mt-4">
+          <label for="bulkLessons" class="form-label">Bulk Lesson Entry (one per line: Student,Teacher,Date,Time,Duration,Notes)</label>
+          <textarea id="bulkLessons" class="form-control mb-2" rows="4" placeholder="Ali Veli,Mehmet,2024-01-10,10:00,60,Grammar\nAli Veli,Mehmet,2024-01-12,10:00,60,Speaking"></textarea>
+          <button id="bulkLessonsBtn" class="btn btn-primary">Toplu Ekle</button>
+        </div>
         <div class="table-responsive">
           <div id="lessons-table"></div>
         </div>
@@ -791,6 +796,38 @@
       editingStudentIndex = index;
       document.getElementById('studentName').focus();
     }
+
+    // Bulk lesson entry
+    document.getElementById('bulkLessonsBtn').addEventListener('click', function() {
+      const lines = document.getElementById('bulkLessons').value.split('\n').map(l => l.trim()).filter(l => l);
+      let added = 0;
+      lines.forEach(line => {
+        // Student,Teacher,Date,Time,Duration,Notes
+        const parts = line.split(',');
+        if (parts.length >= 5) {
+          const lesson = {
+            id: Date.now().toString() + Math.random(),
+            student: parts[0].trim(),
+            teacher: parts[1].trim(),
+            date: parts[2].trim(),
+            time: parts[3].trim(),
+            duration: parts[4].trim(),
+            notes: parts[5] ? parts.slice(5).join(',').trim() : ''
+          };
+          lessons.push(lesson);
+          added++;
+        }
+      });
+      if (added > 0) {
+        localStorage.setItem('lessons', JSON.stringify(lessons));
+        displayLessons();
+        generateStudentReport();
+        document.getElementById('bulkLessons').value = '';
+        alert(added + ' lesson(s) added!');
+      } else {
+        alert('No valid lesson lines found. Each line must have at least 5 comma-separated values.');
+      }
+    });
   </script>
 </body>
 </html> 
