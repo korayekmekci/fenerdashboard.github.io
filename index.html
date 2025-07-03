@@ -160,7 +160,7 @@
         <div class="mt-4">
           <label for="bulkLessons" class="form-label">Bulk Lesson Entry (one per line: Student,Teacher,Date,Time,Duration,Notes)</label>
           <textarea id="bulkLessons" class="form-control mb-2" rows="4" placeholder="Ali Veli,Mehmet,2024-01-10,10:00,60,Grammar\nAli Veli,Mehmet,2024-01-12,10:00,60,Speaking"></textarea>
-          <button id="bulkLessonsBtn" class="btn btn-primary">Toplu Ekle</button>
+          <button id="bulkLessonsBtn" class="btn btn-primary">Bulk Add</button>
         </div>
         <div class="table-responsive">
           <div id="lessons-table"></div>
@@ -374,7 +374,7 @@
       }
       let html = `<table class="table table-striped"><thead><tr><th>Student</th><th>Teacher</th><th>Date</th><th>Time</th><th>Duration</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
       lessons.forEach((lesson, index) => {
-        html += `<tr><td>${lesson.student || ''}</td><td>${lesson.teacher || ''}</td><td>${lesson.date || ''}</td><td>${lesson.time || ''}</td><td>${lesson.duration || ''}</td><td>${lesson.notes || ''}</td><td><button class="btn btn-sm btn-danger" onclick="deleteLesson(${index})">Delete</button></td></tr>`;
+        html += `<tr><td>${lesson.student || ''}</td><td>${lesson.teacher || ''}</td><td>${lesson.date || ''}</td><td>${lesson.time || ''}</td><td>${lesson.duration || ''}</td><td>${lesson.notes || ''}</td><td><button class="btn btn-sm btn-secondary me-1" onclick="editLesson(${index})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteLesson(${index})">Delete</button></td></tr>`;
       });
       html += '</tbody></table>';
       container.innerHTML = html;
@@ -679,7 +679,7 @@
     document.getElementById('addLessonForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const lesson = {
-        id: Date.now().toString(),
+        id: editingLessonIndex !== null ? lessons[editingLessonIndex].id : Date.now().toString(),
         student: document.getElementById('lessonStudent').value,
         teacher: document.getElementById('lessonTeacher').value,
         date: document.getElementById('lessonDate').value,
@@ -687,7 +687,12 @@
         duration: document.getElementById('lessonDuration').value,
         notes: document.getElementById('lessonNotes').value.trim()
       };
-      lessons.push(lesson);
+      if (editingLessonIndex !== null) {
+        lessons[editingLessonIndex] = lesson;
+        editingLessonIndex = null;
+      } else {
+        lessons.push(lesson);
+      }
       localStorage.setItem('lessons', JSON.stringify(lessons));
       displayLessons();
       generateStudentReport();
@@ -795,6 +800,20 @@
       document.getElementById('studentPackage').value = student.package;
       editingStudentIndex = index;
       document.getElementById('studentName').focus();
+    }
+
+    // Edit lesson logic
+    let editingLessonIndex = null;
+    function editLesson(index) {
+      const lesson = lessons[index];
+      document.getElementById('lessonStudent').value = lesson.student;
+      document.getElementById('lessonTeacher').value = lesson.teacher;
+      document.getElementById('lessonDate').value = lesson.date;
+      document.getElementById('lessonTime').value = lesson.time;
+      document.getElementById('lessonDuration').value = lesson.duration;
+      document.getElementById('lessonNotes').value = lesson.notes;
+      editingLessonIndex = index;
+      document.getElementById('lessonStudent').focus();
     }
 
     // Bulk lesson entry
