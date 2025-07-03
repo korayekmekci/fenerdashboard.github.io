@@ -435,20 +435,24 @@
       const container = document.getElementById('student-report-table');
       if (!container) return;
 
-      // --- Summary boxes ---
+      // Get up-to-date data from localStorage
+      let students = JSON.parse(localStorage.getItem('students')) || [];
+      let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+      let payments = JSON.parse(localStorage.getItem('payments')) || [];
+      let accountsPayable = JSON.parse(localStorage.getItem('accountsPayable')) || [];
+
+      // --- SUMMARY BOXES ---
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
       let totalHoursThisMonth = 0;
       let totalHoursThisYear = 0;
       let totalPaymentsThisMonth = 0;
-      // Accounts Payable monthly total (dynamic)
       let accountsPayableMonthlyTotal = 0;
-      if (accountsPayable && accountsPayable.length > 0) {
-        accountsPayableMonthlyTotal = accountsPayable.reduce((sum, ap) => sum + (parseFloat(ap.balanceDue) || 0), 0);
-      }
+
+      // Calculate lessons totals
       lessons.forEach(lesson => {
-        if (!lesson.date) return;
+        if (!lesson.date || !lesson.duration) return;
         const lessonDate = new Date(lesson.date);
         const duration = parseFloat(lesson.duration) || 0;
         if (lessonDate.getFullYear() === currentYear) {
@@ -458,14 +462,22 @@
           }
         }
       });
+
+      // Calculate payments totals
       payments.forEach(payment => {
-        if (!payment.date) return;
+        if (!payment.date || !payment.amount) return;
         const paymentDate = new Date(payment.date);
         if (paymentDate.getFullYear() === currentYear && paymentDate.getMonth() === currentMonth) {
           totalPaymentsThisMonth += parseFloat(payment.amount) || 0;
         }
       });
 
+      // Calculate accounts payable total
+      if (accountsPayable && accountsPayable.length > 0) {
+        accountsPayableMonthlyTotal = accountsPayable.reduce((sum, ap) => sum + (parseFloat(ap.balanceDue) || 0), 0);
+      }
+
+      // Render summary boxes
       let summaryHtml = `
         <div class="row mb-3">
           <div class="col-md-3">
@@ -490,17 +502,18 @@
           </div>
         </div>
       `;
-
       container.innerHTML = summaryHtml;
 
-      // --- Student Activity Table ---
+      // --- STUDENT ACTIVITY TABLE ---
+      // Normalize function for robust matching
+      const normalize = s => (s || '').trim().toLowerCase();
       let activityRows = [];
       students.forEach(student => {
-        let studentEvents = [];
-        const normalize = s => (s || '').trim().toLowerCase();
         const studentNameNorm = normalize(student.name);
+        // Gather all lessons for this student
         lessons.filter(lesson => normalize(lesson.student) === studentNameNorm).forEach(lesson => {
-          studentEvents.push({
+          activityRows.push({
+            student: student.name,
             type: 'Lesson',
             date: lesson.date,
             time: lesson.time,
@@ -510,8 +523,10 @@
             notes: lesson.notes || ''
           });
         });
+        // Gather all payments for this student
         payments.filter(payment => normalize(payment.student) === studentNameNorm).forEach(payment => {
-          studentEvents.push({
+          activityRows.push({
+            student: student.name,
             type: 'Payment',
             date: payment.date,
             time: '',
@@ -521,49 +536,45 @@
             notes: payment.notes || ''
           });
         });
-        studentEvents.sort((a, b) => {
-          if (a.date === b.date) {
-            return (a.time || '').localeCompare(b.time || '');
-          }
-          return (a.date || '').localeCompare(b.date || '');
-        });
-        const packageInfo = packages[student.package] || { hours: 0, rate: 0 };
-        let totalHours = packageInfo.hours;
-        let usedHours = 0;
-        let totalPaid = 0;
-        let totalCost = totalHours * packageInfo.rate;
-        studentEvents.forEach(event => {
-          if (event.type === 'Lesson') {
-            usedHours += (parseFloat(event.duration) || 0) / 60;
-          }
-          if (event.type === 'Payment') {
-            totalPaid += parseFloat(event.amount) || 0;
-          }
-          let remainingHours = Math.max(0, totalHours - usedHours);
-          let remainingPayment = Math.max(0, totalCost - totalPaid);
-          activityRows.push({
-            student: student.name,
-            type: event.type,
-            date: event.date,
-            time: event.time,
-            duration: event.duration,
-            amount: event.amount,
-            teacher: event.teacher,
-            notes: event.notes,
-            remainingHours: remainingHours.toFixed(1),
-            remainingPayment: remainingPayment.toFixed(2)
-          });
-        });
       });
+      // Sort all activities by date and time (descending)
       activityRows.sort((a, b) => {
         if (a.date === b.date) {
           return (b.time || '').localeCompare(a.time || '');
         }
         return (b.date || '').localeCompare(a.date || '');
       });
-      let activityHtml = `<h5 class=\"mt-4\">Student Activity Report</h5><div class=\"table-responsive\"><table class=\"table table-bordered\"><thead><tr><th>Student</th><th>Type</th><th>Date</th><th>Time</th><th>Duration</th><th>Amount</th><th>Teacher</th><th>Notes</th><th>Remaining Payment</th><th>Remaining Hours</th></tr></thead><tbody>`;
+
+      // Calculate remaining hours and payment for each row
+      let studentProgress = {};
+      students.forEach(student => {
+        const studentNameNorm = normalize(student.name);
+        const packageInfo = packages[student.package] || { hours: 0, rate: 0 };
+        studentProgress[studentNameNorm] = {
+          totalHours: packageInfo.hours,
+          usedHours: 0,
+          totalPaid: 0,
+          totalCost: packageInfo.hours * packageInfo.rate
+        };
+      });
+      // For each activity row, update progress and add remaining info
+      activityRows.forEach(row => {
+        const studentNameNorm = normalize(row.student);
+        if (!studentProgress[studentNameNorm]) return;
+        if (row.type === 'Lesson') {
+          studentProgress[studentNameNorm].usedHours += (parseFloat(row.duration) || 0) / 60;
+        }
+        if (row.type === 'Payment') {
+          studentProgress[studentNameNorm].totalPaid += parseFloat(row.amount) || 0;
+        }
+        row.remainingHours = Math.max(0, studentProgress[studentNameNorm].totalHours - studentProgress[studentNameNorm].usedHours).toFixed(1);
+        row.remainingPayment = Math.max(0, studentProgress[studentNameNorm].totalCost - studentProgress[studentNameNorm].totalPaid).toFixed(2);
+      });
+
+      // Render activity table
+      let activityHtml = `<h5 class="mt-4">Student Activity Report</h5><div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Student</th><th>Type</th><th>Date</th><th>Time</th><th>Duration</th><th>Amount</th><th>Teacher</th><th>Notes</th><th>Remaining Payment</th><th>Remaining Hours</th></tr></thead><tbody>`;
       if (activityRows.length === 0) {
-        activityHtml += '<tr><td colspan=\"10\" class=\"text-center\">No activity found.</td></tr>';
+        activityHtml += '<tr><td colspan="10" class="text-center">No activity found.</td></tr>';
       } else {
         activityRows.forEach(row => {
           activityHtml += `<tr><td>${row.student}</td><td>${row.type}</td><td>${row.date || ''}</td><td>${row.time || ''}</td><td>${row.duration || ''}</td><td>${row.amount || ''}</td><td>${row.teacher || ''}</td><td>${row.notes || ''}</td><td>${row.remainingPayment}₺</td><td>${row.remainingHours}</td></tr>`;
@@ -572,11 +583,8 @@
       activityHtml += '</tbody></table></div>';
       container.innerHTML += activityHtml;
 
+      // Debug: log activity rows to console
       console.log('Student Activity Rows:', activityRows);
-
-      if (students.length === 0) {
-        container.innerHTML += '<div class="alert alert-info">No students found. Add students to see their reports.</div>';
-      }
     }
     function updateDropdowns() {
       const studentDropdowns = ['paymentStudent'];
