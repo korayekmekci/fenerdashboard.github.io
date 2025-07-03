@@ -160,7 +160,7 @@
         <div class="mt-4">
           <label for="bulkLessons" class="form-label">Bulk Lesson Entry (one per line: Student,Teacher,Date,Time,Duration,Notes)</label>
           <textarea id="bulkLessons" class="form-control mb-2" rows="4" placeholder="Ali Veli,Mehmet,2024-01-10,10:00,60,Grammar\nAli Veli,Mehmet,2024-01-12,10:00,60,Speaking"></textarea>
-          <button id="bulkLessonsBtn" class="btn btn-primary">Bulk Add</button>
+          <button id="bulkLessonsBtn" class="btn btn-primary">Toplu Ekle</button>
         </div>
         <div class="table-responsive">
           <div id="lessons-table"></div>
@@ -318,11 +318,7 @@
     let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
     let payments = JSON.parse(localStorage.getItem('payments')) || [];
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-    let accountsPayable = JSON.parse(localStorage.getItem('accountsPayable')) || [
-      {payRate:7.00, lessonsRemaining:153, instructorName:'Kendra', totalAmount:1071, dueDate:'', balanceDue:1071, payments:[null,null,null,null,null,null]},
-      {payRate:10.00, lessonsRemaining:35, instructorName:'Mehmet', totalAmount:350, dueDate:'', balanceDue:350, payments:[null,null,null,null,null,null]},
-      {payRate:7.50, lessonsRemaining:13, instructorName:'Lydia', totalAmount:97.5, dueDate:'', balanceDue:-97.5, payments:[null,null,null,null,null,null]},
-    ];
+    let accountsPayable = JSON.parse(localStorage.getItem('accountsPayable')) || [];
 
     // Initialize dashboard
     document.addEventListener('DOMContentLoaded', function() {
