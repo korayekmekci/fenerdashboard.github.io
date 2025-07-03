@@ -442,8 +442,11 @@
       let totalHoursThisMonth = 0;
       let totalHoursThisYear = 0;
       let totalPaymentsThisMonth = 0;
-      // Accounts Payable monthly total (from static data)
-      let accountsPayableMonthlyTotal = 1071 + 350 + 97.5; // $1,518.50
+      // Accounts Payable monthly total (dynamic)
+      let accountsPayableMonthlyTotal = 0;
+      if (accountsPayable && accountsPayable.length > 0) {
+        accountsPayableMonthlyTotal = accountsPayable.reduce((sum, ap) => sum + (parseFloat(ap.balanceDue) || 0), 0);
+      }
       lessons.forEach(lesson => {
         if (!lesson.date) return;
         const lessonDate = new Date(lesson.date);
@@ -482,7 +485,7 @@
           </div>
           <div class="col-md-3">
             <div class="alert alert-warning text-center" role="alert">
-              <b>Accounts Payable This Month:</b> $${accountsPayableMonthlyTotal.toFixed(2)}
+              <b>Accounts Payable This Month:</b> $${accountsPayable && accountsPayable.length > 0 ? accountsPayableMonthlyTotal.toFixed(2) : '0.00'}
             </div>
           </div>
         </div>
@@ -568,6 +571,8 @@
       }
       activityHtml += '</tbody></table></div>';
       container.innerHTML += activityHtml;
+
+      console.log('Student Activity Rows:', activityRows);
 
       if (students.length === 0) {
         container.innerHTML += '<div class="alert alert-info">No students found. Add students to see their reports.</div>';
